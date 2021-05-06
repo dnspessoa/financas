@@ -24,15 +24,17 @@
         </tr>
     </thead>
     <tbody>
-        <!-- <tr *ngFor="let category of categories">
+        <tr *ngFor="let category of categories">
             <td>
                 <strong>{{category.name}}</strong><br>
                 <small>{{category.description}}</small>
             </td>
             <td>
-                <a [routerLink]="[category.id]" routerLinkActive="router-link-active" class="btn btn-outline-info btn-sm mr-2">Editar</a>
+                <a [routerLink]="[category.id, 'edit']" routerLinkActive="router-link-active" class="btn btn-outline-info btn-sm mr-2">Editar</a>
                 <button (click)="deleteCategory(category)" type="button" class="btn btn-outline-danger btn-sm mr-2">Excluir</button>
+                <!-- <button onclick="console.log('excluir')" type="button" class="btn btn-outline-danger btn-sm mr-2">Excluir</button> -->
             </td>
-        </tr> -->
+        </tr>
     </tbody>
-</table>
+</table>E a
+
