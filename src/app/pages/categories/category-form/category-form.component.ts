@@ -21,7 +21,7 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
    _currentAction: string;
    _categoryForm: FormGroup;
    _pageTitle: string;
-   _serverErrorMessages: string;
+   _serverErrorMessages: string[] = [];
    _submittingForm: boolean = false;
    _category: Category = new Category;
 
@@ -59,7 +59,6 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
     else {
       this._currentAction = 'edit';
     }
-
   }
 
   buildCategoryForm() {
@@ -83,6 +82,64 @@ export class CategoryFormComponent implements OnInit, AfterContentChecked {
         (error) => alert('Ocorreu um erro no servidor, tente mais tarde.')
       );
     }
+  }
+
+  submitForm() {
+    this._submittingForm = true;
+
+    if(this._currentAction == 'new') {
+      this.createCategory();
+    }
+    else {
+      this.updateCategory();
+    }
+  }
+
+  createCategory() {
+    const category: Category = Object.assign(new Category(), this._categoryForm.value);
+
+    this.categoryService.create(category)
+      .subscribe(
+        category => this.actionsForSucess(category),
+        error =>  this.actionForError(error)
+      );
+  }
+
+  actionsForSucess(category: Category) {
+    //toastr falta implementar
+    alert('Solicitação processada com sucesso');
+
+    // recarrega formulario para o metodo de edição
+    // url atual: nomesitel.com/categories/new
+    // skipLocationChange: não armazena no historico do navegador
+    // redirect/reload component page
+    this.router.navigateByUrl('categories', {skipLocationChange: true}).then(
+      () => this.router.navigate(['categories', category.id, 'edit'])
+    );
+  }
+
+  actionForError(error: any): void {
+    //this.toastr.error('Ocorreu um erro ao processar a sua solicitação');
+    alert('Ocorreu um erro ao processar a sua solicitação');
+
+    this._submittingForm = false;
+
+    if (error.status === 422) {
+      this._serverErrorMessages = JSON.parse(error._body).errors;
+    }
+    else{
+      this._serverErrorMessages = ['Falha na comunicação com o servidoor. Por favor, tente mais tarde.']
+    }
+  }
+
+  updateCategory() {
+    const category: Category = Object.assign(new Category(), this._categoryForm.value);
+
+    this.categoryService.update(category)
+      .subscribe(
+        category => this.actionsForSucess(category),
+        error =>  this.actionForError(error)
+      );
   }
 
 }
