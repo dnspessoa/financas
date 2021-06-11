@@ -4,7 +4,7 @@ export class Entry {
 
     constructor(
         public id?: number,
-        public nome?: string,
+        public name?: string,
         public description?: string,
         public type?: string,
         public amount?: string,
