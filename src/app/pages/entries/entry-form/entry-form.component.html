@@ -1,0 +1,68 @@
+<p>entry-form works!</p>
+<nav class="mb-5">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+        <li class="breadcrumb-item"><a routerLink="/entries">Lançamentos</a></li>
+        <!-- <li class="breadcrumb-item active">Formulário de Lançamento</li> -->
+        <li class="breadcrumb-item active">{{_pageTitle}}</li>
+    </ol>
+</nav>
+
+<div class="row mb-4">
+    <div class="col-md-9">
+        <!-- <h1 class="h2 border-left pl-2">Formulário de Lançamento {{currentAction}}</h1> -->
+        <!-- <h1 class="h2 border-left pl-2">Formulário de Lançamento</h1> -->
+        <h1 class="h2 border-left pl-2">{{_pageTitle}}</h1>
+    </div>
+    <div class="col-md-3">
+        <a routerLink="/entries" class="btn btn-light float-right">Voltar</a>
+    </div>
+</div>
+
+
+    <!-- <form> -->
+    <!-- <form [formGroup]="_entryForm"> --> -->
+    <form [formGroup]="_entryForm" (submit)="submitForm()">    
+
+    <div class="card">
+        <div class="heard">
+            Informações sobre a Lançamento
+        </div>
+
+        <div class="card-body">
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="name">Nome</label>
+                    <input id="name" type="text" class="form-control" formControlName="name">
+                    <!-- messagens de erro -->
+                    <div class="text-danger" *ngIf="_entryForm.get('name').invalid && _entryForm.get('name').touched">
+                        <div *ngIf="_entryForm.get('name').errors.required">Dado obrigatório</div>
+                        <div *ngIf="_entryForm.get('name').errors.minlength">Deve ter no mínimo 2 caracteres</div>
+                    </div>
+
+                </div>
+
+                <div class="form group col-md-8">
+                    <label for="description">Descrição</label>
+                    <input id="description" type="text" class="form-control" formControlName="description">
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- Exibi alertas de erros -->
+    <div class="alert alert-danger mt-4" *ngIf="_serverErrorMessages">
+        <strong>Erro no servidor:</strong>
+        <ul>
+            <li *ngFor="let error of _serverErrorMessages">{{error}}</li>
+        </ul>
+    </div>
+
+    <button type="submit" class="btn btn-outline-primary btn-lg float-right mt-3">Salvar</button>
+    <!-- <button [disabled]="_submittingForm || _entryForm.invalid" type="submit" class="btn btn-outline-primary btn-lg float-right mt-3">Salvar</button> -->
+    
+    
+
+    <!-- {{showSuccess}} -->
+
+</form>
