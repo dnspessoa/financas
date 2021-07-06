@@ -20,9 +20,9 @@
 </div>
 
 
-    <!-- <form> -->
-    <!-- <form [formGroup]="_entryForm"> --> -->
-    <form [formGroup]="_entryForm" (submit)="submitForm()">    
+<!-- <form> -->
+<!-- <form [formGroup]="_entryForm"> --> -->
+<form [formGroup]="_entryForm" (submit)="submitForm()">
 
     <div class="card">
         <div class="heard">
@@ -30,23 +30,106 @@
         </div>
 
         <div class="card-body">
+
             <div class="form-row">
-                <div class="form-group col-md-4">
-                    <label for="name">Nome</label>
+                <!--type-->
+                <div class="form-group col-md-2">
+                    <label for="type">Tipo</label>
+                    <select name="type" id="type" formControlName="type" class="form-control">
+                        <!-- <option value="expense">Despesa</option> -->
+                        <!-- <option value="expense">Receita</option> -->
+                        <option *ngFor="let opt of typeOptions" [value]="opt.value">{{opt.text}}</option>
+                    </select>
+                    <!-- messagens de erro -->
+                    <div class="text-danger" *ngIf="_entryForm.get('type').invalid && _entryForm.get('type').touched">
+                        <div *ngIf="_entryForm.get('type').errors.required">Dado obrigatório</div>
+                    </div>
+                </div>
+
+                <!--name-->
+                <div class="form-group col-md-5">
+                    <label for="name">Lançamento</label>
                     <input id="name" type="text" class="form-control" formControlName="name">
                     <!-- messagens de erro -->
                     <div class="text-danger" *ngIf="_entryForm.get('name').invalid && _entryForm.get('name').touched">
                         <div *ngIf="_entryForm.get('name').errors.required">Dado obrigatório</div>
                         <div *ngIf="_entryForm.get('name').errors.minlength">Deve ter no mínimo 2 caracteres</div>
                     </div>
-
                 </div>
 
-                <div class="form group col-md-8">
+                <!--amount-->
+                <div class="form-group col-md-3">
+                    <label for="amount">Valor</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">R$</div>
+                        </div>
+                        <input [imask]="_imaskConfig" id="amount" type="text" class="form-control text-right"
+                            formControlName="amount">
+                    </div>
+                    <!-- messagens de erro -->
+                    <div class="text-danger"
+                        *ngIf="_entryForm.get('amount').invalid && _entryForm.get('amount').touched">
+                        <div *ngIf="_entryForm.get('amount').errors.required">Dado obrigatório</div>
+                    </div>
+                </div>
+
+                <!--date-->
+                <div class="form-group col-md-2">
+                    <label for="date">Data</label>
+                    <p-calendar 
+                        id="date" 
+                        formControlName="date"  
+                        inputStyleClass="form-control" 
+                        dataType="string" 
+                        dateFormat="dd/mm/yy"
+                        [locale]="ptBR"
+                        [showButtonBar]="true">
+                    </p-calendar>
+                    <!-- messagens de erro -->
+                    <div class="text-danger" *ngIf="_entryForm.get('date').invalid && _entryForm.get('date').touched">
+                        <div *ngIf="_entryForm.get('date').errors.required">Dado obrigatório</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <!--paid-->
+                <div class="form-group col-md-2">
+                    <label for="paid">Pago</label>
+                    <div class="btn-group">
+                        <label (click)="_entryForm.get('paid').setValue(true)" [class.active]="_entryForm.get('paid').value == true" class="btn btn-outline-info">Pago</label>
+                        <label (click)="_entryForm.get('paid').setValue(false)" [class.active]="_entryForm.get('paid').value == false" class="btn btn-outline-info">Pendente</label>
+                    </div>
+
+                    <!-- messagens de erro -->
+                    <div class="text-danger"
+                        *ngIf="_entryForm.get('paid').invalid && _entryForm.get('paid').touched">
+                        <div *ngIf="_entryForm.get('paid').errors.required">Dado obrigatório</div>
+                    </div>
+                </div>
+
+                <!--categoryId-->
+                <div class="form-group col-md-7 ml-3">
+                    <label for="categoryId">Categoria</label>
+                    <select name="categoryId" id="categoryId" formControlName="categoryId" class="form-control">
+                        <!-- <option value="1">Categoria 1</option> -->
+                        <!-- <option value="2">Categoria 2</option> -->
+                        <option *ngFor="let category of _categories" [value]="category.id">{{category.name}}</option>
+                    </select>
+                    <!-- messagens de erro -->
+                    <div class="text-danger" *ngIf="_entryForm.get('categoryId').invalid && _entryForm.get('categoryId').touched">
+                        <div *ngIf="_entryForm.get('categoryId').errors.required">Dado obrigatório</div>
+                    </div>
+                </div>
+            
+                <!--description-->
+                <div class="form-group col-md-7 ml-3">
                     <label for="description">Descrição</label>
                     <input id="description" type="text" class="form-control" formControlName="description">
                 </div>
             </div>
+
         </div>
 
     </div>
@@ -60,9 +143,10 @@
 
     <button type="submit" class="btn btn-outline-primary btn-lg float-right mt-3">Salvar</button>
     <!-- <button [disabled]="_submittingForm || _entryForm.invalid" type="submit" class="btn btn-outline-primary btn-lg float-right mt-3">Salvar</button> -->
-    
-    
 
     <!-- {{showSuccess}} -->
 
 </form>
+
+<!-- teste valor alterados em tempo real -->
+<pre>{{_entryForm.value | json}}</pre>

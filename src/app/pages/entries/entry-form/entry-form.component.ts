@@ -7,6 +7,9 @@ import { EntryService } from '../shared/entry.service';
 
 import { switchMap } from 'rxjs/operators';
 
+import { Category } from '../../categories/shared/category.model';
+import { CategoryService } from '../../categories/shared/category.service';
+
 //import toastr from 'ngx-toastr'
 
 @Component({
@@ -18,18 +21,43 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
 
   //prop class
 
-   _currentAction: string;
-   _entryForm: FormGroup;
-   _pageTitle: string;
-   _serverErrorMessages: string[] = [];
-   _submittingForm: boolean = false;
-   _entry: Entry = new Entry;
+  _currentAction: string;
+  _entryForm: FormGroup;
+  _pageTitle: string;
+  _serverErrorMessages: string[] = [];
+  _submittingForm: boolean = false;
+  _entry: Entry = new Entry;
+  _categories: Array<Category>;
+
+  _imaskConfig = {
+    mask: Number,
+    scale: 2,
+    thousandsSeparator: '',
+    padFractionalZeros: true,
+    normalizeZeros: true,
+    radix: ','
+  };
+
+  ptBR = {
+    firstDayOfWeek: 0,
+    dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+    dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+    dayNamesMin: ['Do', 'Se', 'Te', 'Qu', 'Qu', 'Se', 'Sa'],
+    monthNames: [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho',
+      'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ],
+    monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+    today: 'Hoje',
+    clear: 'Limpar'
+  };
 
   constructor(
     private entryService: EntryService,
     private route: ActivatedRoute,
     private router: Router,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private categoryService: CategoryService
   ) { }
 
   ngAfterContentChecked(): void {
@@ -50,7 +78,9 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
     this.setCurrentAction();
     this.buildEntryForm();
     this.loadEntry();
+    this.loadCategories();
   }
+  
 
   setCurrentAction() {
     if (this.route.snapshot.url[0].path == 'new') {
@@ -66,10 +96,10 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
       id: [null],
       name: [null, [Validators.required, Validators.maxLength(2)]],
       description: [null],
-      type: [null, [Validators.required]],
+      type: ["expense", [Validators.required]],
       amount: [null, [Validators.required]],
       date: [null, [Validators.required]],
-      paid: [null, [Validators.required]],
+      paid: [true, [Validators.required]],
       categoryId: [null, [Validators.required]]
     });
   }
@@ -89,15 +119,32 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
     }
   }
 
+  private loadCategories() {
+    this.categoryService.getAll().subscribe(
+      categories => this._categories = categories
+    );
+  }
+
   submitForm() {
     this._submittingForm = true;
 
-    if(this._currentAction == 'new') {
+    if (this._currentAction == 'new') {
       this.createEntry();
     }
     else {
       this.updateEntry();
     }
+  }
+
+  get typeOptions(): Array<any> {
+    return Object.entries(Entry.types).map(
+      ([value, text]) => {
+        return {
+          text: text,
+          value: value
+        }
+      }
+    )
   }
 
   createEntry() {
@@ -106,7 +153,7 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
     this.entryService.create(entry)
       .subscribe(
         entry => this.actionsForSucess(entry),
-        error =>  this.actionForError(error)
+        error => this.actionForError(error)
       );
   }
 
@@ -118,7 +165,7 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
     // url atual: nomesitel.com/entries/new
     // skipLocationChange: não armazena no historico do navegador
     // redirect/reload component page
-    this.router.navigateByUrl('entries', {skipLocationChange: true}).then(
+    this.router.navigateByUrl('entries', { skipLocationChange: true }).then(
       () => this.router.navigate(['entries', entry.id, 'edit'])
     );
   }
@@ -132,7 +179,7 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
     if (error.status === 422) {
       this._serverErrorMessages = JSON.parse(error._body).errors;
     }
-    else{
+    else {
       this._serverErrorMessages = ['Falha na comunicação com o servidoor. Por favor, tente mais tarde.']
     }
   }
@@ -143,7 +190,7 @@ export class EntryFormComponent implements OnInit, AfterContentChecked {
     this.entryService.update(entry)
       .subscribe(
         entry => this.actionsForSucess(entry),
-        error =>  this.actionForError(error)
+        error => this.actionForError(error)
       );
   }
 
